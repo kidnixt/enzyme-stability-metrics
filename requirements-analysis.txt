@@ -1,0 +1,9 @@
+# X1 (curvas) y X2 (predictor vs medicion). Solo CPU. Corre en tu PC tambien.
+numpy
+scipy
+pandas
+matplotlib
+pillow          # digitalizacion de figuras
+biopython       # parseo de PDB
+jupyterlab
+ipykernel

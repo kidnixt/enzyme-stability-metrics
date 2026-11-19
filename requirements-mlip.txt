@@ -1,0 +1,7 @@
+# X3 (clusteres de sitio activo con UMA). Entorno SEPARADO del de analisis:
+# fairchem arrastra su propia version de torch y rompe entornos mezclados.
+# Instalar DESPUES de torch con el CUDA correcto para el cluster.
+fairchem-core>=2.14
+ase
+huggingface_hub
+numpy

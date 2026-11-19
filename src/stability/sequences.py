@@ -11,12 +11,13 @@ The offset is not an assumption. It is confirmed by the data itself: both
 mutations land exactly on their named positions (126 and 314) with this offset
 and with no other. `verify_mutations()` enforces it.
 
-Open issue
-----------
-The provided sequences are 423 residues; 423 + 3 = 426, but canonical P25524 is
-427. One residue is missing, and it cannot be at the N-terminus (that would
-shift the mutations to 127 and 315). It must be at the C-terminus. Resolve
-before aligning sequence to structure (1K6W).
+Resolved (2026-11-19)
+--------------------
+The provided sequences are 423 residues; 423 + 3 = 426, while canonical P25524
+is 427. The structures settle it: all four PDB files span residues 4..426, so
+residues 1-3 and residue 427 are simply not modelled in 1K6W. The sequences
+match the structures exactly, and sequence index i maps to structure residue
+i + 3 with no further correction.
 """
 
 SEQ_OFFSET = 3

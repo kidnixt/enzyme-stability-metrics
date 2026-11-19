@@ -51,10 +51,10 @@ canónica:
 No es un supuesto: `sequences.verify_mutations()` lo confirma porque las dos
 mutaciones caen exactamente en 126 y 314 con ese offset y con ningún otro.
 
-**Pendiente**: las secuencias tienen 423 residuos; 423 + 3 = 426, pero P25524
-tiene 427. Falta un residuo y, por las posiciones de las mutaciones, no puede
-estar al principio: tiene que estar en el extremo C-terminal. Hay que resolverlo
-antes de alinear secuencia contra estructura (1K6W).
+**Resuelto (2026-11-19)**: los cuatro PDB abarcan los residuos 4..426, así que
+los residuos 1-3 y el 427 simplemente no están modelados en 1K6W. Las secuencias
+coinciden exactamente con las estructuras y el mapeo índice+3 no necesita más
+corrección.
 
 ## Estructura
 
@@ -72,8 +72,13 @@ docs/resultados/
 
 ## Uso
 
+En tu PC (alcanza para X1 y X2):
+
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-analysis.txt
 PYTHONPATH=src python -m stability.sequences      # verifica las 4 secuencias
 jupyter lab notebooks/01_inactivation_curves.ipynb
 ```
+
+En el cluster de ORT, incluido el entorno con GPU para X3: ver
+`docs/setup-cluster.md`.
