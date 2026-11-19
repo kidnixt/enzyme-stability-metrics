@@ -3,6 +3,7 @@
 # Crea DOS entornos separados y los registra como kernels de Jupyter.
 #
 #   bash scripts/setup_cluster.sh analysis    -> X1 y X2, solo CPU
+#   bash scripts/setup_cluster.sh plm         -> X2, ESM-2
 #   bash scripts/setup_cluster.sh mlip        -> X3, necesita GPU
 #
 # No usa conda: fairchem dejo de soportarlo y pytorch tambien lo discontinuo.
@@ -26,6 +27,12 @@ case "$WHICH" in
   analysis)
     pip install -r "$REPO/requirements-analysis.txt"
     ;;
+  plm)
+    # ESM-2 via transformers. En el cluster conviene GPU; en CPU tambien corre
+    # porque solo se evaluan 4 secuencias en 2 posiciones.
+    pip install torch --index-url https://download.pytorch.org/whl/cu124
+    pip install -r "$REPO/requirements-plm.txt"
+    ;;
   mlip)
     # torch primero, con el build de CUDA que corresponda. El driver del cluster
     # es 12.9; las ruedas cu124 funcionan (los drivers son compatibles hacia
@@ -34,7 +41,7 @@ case "$WHICH" in
     pip install -r "$REPO/requirements-mlip.txt"
     ;;
   *)
-    echo "uso: $0 [analysis|mlip]" >&2; exit 1 ;;
+    echo "uso: $0 [analysis|plm|mlip]" >&2; exit 1 ;;
 esac
 
 python -m ipykernel install --user --name "esm-$WHICH" \

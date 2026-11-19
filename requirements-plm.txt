@@ -1,0 +1,9 @@
+# X2 — predictores de estabilidad. Entorno aparte: torch es pesado y no tiene
+# por que estar en el entorno de analisis.
+torch
+transformers
+accelerate
+numpy
+pandas
+matplotlib
+ipykernel
