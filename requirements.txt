@@ -1,0 +1,10 @@
+numpy
+scipy
+pandas
+matplotlib
+pillow          # figure digitisation
+biopython       # PDB parsing for the active-site cluster builder
+wandb
+# --- heavy, only for the MLIP work; install separately ---
+# ase
+# fairchem-core>=2.5.0

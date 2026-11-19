@@ -1,0 +1,43 @@
+# Thermal inactivation of E. coli cytosine deaminase variants at 50 C.
+# PROVENANCE: digitized from the published figure (residual activity vs time),
+# NOT raw lab data. Axis calibration from detected tick marks; see
+# scripts/digitize_figure.py for the full procedure and constants.
+# Uncertainty on activity_pct is ~1-2 percentage points from digitization alone.
+# t=0 is 100% by construction (the assay normalises to pre-incubation activity).
+# MISSING: DOUBLE at t=15,30,45,60,180 and D314A at t=240 could not be resolved
+# because the two series overlap at those points.
+variant,time_min,activity_pct
+WT,0,100.0
+WT,15,68.3
+WT,30,59.1
+WT,45,64.9
+WT,60,62.7
+WT,120,61.6
+WT,180,56.8
+WT,240,61.1
+WT,300,58.9
+WT,400,56.8
+D314A,0,100.0
+D314A,15,55.0
+D314A,30,54.3
+D314A,45,49.2
+D314A,60,49.8
+D314A,120,44.9
+D314A,180,43.7
+D314A,300,47.9
+D314A,400,43.6
+DOUBLE,0,100.0
+DOUBLE,120,52.7
+DOUBLE,240,44.6
+DOUBLE,300,52.4
+DOUBLE,400,48.3
+S126R,0,100.0
+S126R,15,22.5
+S126R,30,23.5
+S126R,45,23.6
+S126R,60,20.8
+S126R,120,21.4
+S126R,180,21.2
+S126R,240,23.1
+S126R,300,23.5
+S126R,400,19.9
