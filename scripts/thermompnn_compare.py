@@ -63,8 +63,8 @@ def do_single(path):
         print(f"\nDOUBLE additive = {additive:+7.3f} kcal/mol"
               "   (what any additive model must say)")
         pred = {"WT": 0.0, **found, "DOUBLE": additive}
-        print("\npredicted ranking (least destabilising first):")
-        print("   " + " > ".join(sorted(pred, key=lambda v: -pred[v])))
+        print("\npredicted ranking (MOST robust first, i.e. lowest ddG):")
+        print("   " + " > ".join(sorted(pred, key=lambda v: pred[v])))
         print("measured ranking  (most robust first):")
         print("   " + " > ".join(sorted(MEASURED_A_INF,
                                         key=lambda v: -MEASURED_A_INF[v])))
