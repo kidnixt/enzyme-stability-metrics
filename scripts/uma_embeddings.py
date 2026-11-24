@@ -17,6 +17,18 @@ Esto NO es medir una falla mas. Es construir una representacion y ver si gana.
 Puede salir positivo, que es lo que ninguno de los experimentos anteriores
 podia.
 
+La trampa de la equivarianza
+----------------------------
+UMA es una red equivariante: la representacion de cada atomo no es un vector
+plano sino (S, D), donde S son componentes esfericos. Para L=2 son 9: uno de
+l=0, tres de l=1, cinco de l=2. Los de l>0 ROTAN CON LA MOLECULA.
+
+Usarlos crudos como features seria un error silencioso: girar la misma
+molecula cambiaria la prediccion, lo cual no tiene sentido para clasificar.
+Asi que se construyen invariantes - el componente l=0, que es escalar, y la
+norma de cada bloque l>0 - y despues se verifica empiricamente rotando una
+molecula, en vez de confiar en que el razonamiento de arriba sea correcto.
+
 Como se saca
 ------------
 Sin depender de que fairchem exponga una API para esto: se enganchan hooks de
@@ -30,12 +42,18 @@ Por eso el script corre en dos fases:
                 cada uno sobre una molecula de prueba. Sirve para elegir de
                 donde sacar la representacion, en vez de adivinar.
 
+    --check-invariance
+                extrae la huella de una molecula, la rota al azar, la vuelve a
+                extraer y compara. Si no coinciden, las features estan rotas y
+                no hay que seguir.
+
     (default)   engancha el modulo elegido, corre las 761 moleculas y escribe
                 la huella de cada una.
 
 Uso:
     python scripts/uma_embeddings.py --inspect
-    python scripts/uma_embeddings.py --layer <nombre que haya salido>
+    python scripts/uma_embeddings.py --layer module.backbone --check-invariance
+    python scripts/uma_embeddings.py --layer module.backbone
 """
 
 import argparse
@@ -58,6 +76,9 @@ def main():
     ap.add_argument("--max-depth", type=int, default=3,
                     help="profundidad del arbol de modulos al inspeccionar")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--check-invariance", action="store_true")
+    ap.add_argument("--pool", default="mean,max",
+                    help="agrupamiento sobre atomos: mean, max, min")
     args = ap.parse_args()
 
     import torch
@@ -138,15 +159,20 @@ def main():
 
         print(f"molecula de prueba: {mols[0].GetProp('smiles')}  "
               f"({n_at} atomos)\n")
-        hits = [(n, s) for n, s in seen.items() if s and s[0] == n_at and len(s) == 2]
+        hits = [(n, s) for n, s in seen.items()
+                if s and s[0] == n_at and len(s) in (2, 3)]
         for name, shape in sorted(seen.items()):
-            mark = "   <- UNA FILA POR ATOMO" if (name, shape) in hits else ""
+            mark = ""
+            if (name, shape) in hits:
+                mark = ("   <- POR ATOMO, EQUIVARIANTE" if len(shape) == 3
+                        else "   <- POR ATOMO, plano")
             print(f"   {name:52s} {str(shape):>18s}{mark}")
         print(f"\n{len(hits)} candidatos con una fila por atomo.")
         if hits:
             print("El de mas adelante en la red suele ser el mas informativo:")
-            for n, s in hits[-3:]:
-                print(f"   --layer {n}    (D = {s[1]})")
+            for n, s in hits[-4:]:
+                d = f"S = {s[1]}, D = {s[2]}" if len(s) == 3 else f"D = {s[1]}"
+                print(f"   --layer {n}    ({d})")
         print("\nElegi uno y corre de nuevo con --layer <nombre>.")
         return
 
@@ -161,11 +187,88 @@ def main():
         t = out
         if isinstance(t, (tuple, list)) and t:
             t = t[0]
-        buf["x"] = t.detach().float().cpu().numpy()
+        if isinstance(t, torch.Tensor):
+            buf["x"] = t.detach().float().cpu().numpy()
 
+    def invariants(x):
+        """De (n_atomos, S, D) o (n_atomos, D) a (n_atomos, K) invariante.
+
+        Para S = (L+1)^2 componentes esfericos, el bloque l ocupa las
+        posiciones l^2 .. (l+1)^2. El bloque l=0 es un escalar, invariante tal
+        cual. Los bloques l>0 rotan, pero su NORMA no: por cada l>0 se guarda
+        la norma del bloque, que son D numeros mas.
+        """
+        if x.ndim == 2:
+            return x
+        n, S, D = x.shape
+        L = int(round(S ** 0.5)) - 1
+        if (L + 1) ** 2 != S:
+            # no es un cuadrado perfecto: se usa la norma sobre S, conservador
+            return np.linalg.norm(x, axis=1)
+        parts = [x[:, 0, :]]                       # l = 0, ya invariante
+        for l in range(1, L + 1):
+            blk = x[:, l * l:(l + 1) * (l + 1), :]
+            parts.append(np.linalg.norm(blk, axis=1))
+        return np.concatenate(parts, axis=1)
+
+    def fingerprint(x, pools):
+        inv = invariants(x)
+        out = []
+        for p_ in pools:
+            out.append({"mean": inv.mean(0), "max": inv.max(0),
+                        "min": inv.min(0)}[p_])
+        return np.concatenate(out)
+
+    pools = [p_.strip() for p_ in args.pool.split(",") if p_.strip()]
     h = target.register_forward_hook(hook)
+
+    # ---- chequeo de invarianza: rotar la molecula no debe cambiar la huella
+    if args.check_invariance:
+        try:
+            m = mols[0]
+            a = to_atoms(m)
+            a.get_potential_energy()
+            f1 = fingerprint(buf["x"], pools)
+            raw1 = buf["x"].copy()
+
+            rng = np.random.default_rng(0)
+            q = rng.normal(size=(3, 3))
+            R, _ = np.linalg.qr(q)
+            if np.linalg.det(R) < 0:
+                R[:, 0] *= -1                      # rotacion propia, sin reflejar
+            b = to_atoms(m)
+            b.set_positions(b.get_positions() @ R.T)
+            b.calc = calc
+            b.get_potential_energy()
+            f2 = fingerprint(buf["x"], pools)
+            raw2 = buf["x"]
+        finally:
+            h.remove()
+
+        d_inv = float(np.abs(f1 - f2).max())
+        esc = float(max(np.abs(f1).max(), 1e-9))
+        d_raw = float(np.abs(raw1 - raw2).max())
+        print("=" * 68)
+        print("Chequeo: la huella sobrevive a rotar la molecula?")
+        print("=" * 68)
+        print(f"   molecula          : {mols[0].GetProp('smiles')}")
+        print(f"   dimensiones       : {len(f1)}")
+        print(f"   cambio en el tensor CRUDO al rotar : {d_raw:.4f}")
+        print(f"   cambio en la HUELLA al rotar       : {d_inv:.2e}")
+        print(f"   relativo a su escala               : {d_inv/esc:.2e}")
+        print()
+        if d_inv / esc < 1e-3:
+            print("   OK: la huella es invariante. El crudo si cambia, que es")
+            print("   justamente la razon por la que no se puede usar crudo.")
+        else:
+            print("   ROTO: la huella cambia al rotar. No seguir: cualquier")
+            print("   modelo entrenado sobre esto aprenderia la orientacion")
+            print("   arbitraria que le dio RDKit al generar la geometria.")
+        return
+
     rows, n_err = [], 0
-    print(f"extrayendo de '{args.layer}' sobre {len(mols)} moleculas\n")
+    print(f"extrayendo de '{args.layer}' sobre {len(mols)} moleculas")
+    print(f"agrupamiento: {', '.join(pools)}\n")
 
     try:
         for k, m in enumerate(mols):
@@ -173,21 +276,19 @@ def main():
                 a = to_atoms(m)
                 a.get_potential_energy()
                 x = buf.get("x")
-                if x is None or x.ndim != 2 or x.shape[0] != len(a):
+                if x is None or x.shape[0] != len(a):
                     n_err += 1
                     continue
+                feats = fingerprint(x, pools)
             except Exception as e:
                 n_err += 1
                 print(f"   {m.GetProp('mol_id')}: {type(e).__name__}")
                 continue
-            # tres agrupamientos: el promedio describe la molecula entera,
-            # el maximo destaca el atomo mas extremo en cada dimension
-            feats = np.concatenate([x.mean(0), x.max(0), x.min(0)])
             rows.append({"mol_id": m.GetProp("mol_id"),
                          "y": int(m.GetProp("y")),
                          "split": m.GetProp("split"),
                          **{f"emb{i}": float(v) for i, v in enumerate(feats)}})
-            if (k + 1) % 50 == 0:
+            if (k + 1) % 100 == 0:
                 print(f"   {k+1}/{len(mols)}")
     finally:
         h.remove()
