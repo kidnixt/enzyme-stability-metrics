@@ -1,40 +1,43 @@
-"""Forces from UMA on the four variants: the original question, done directly.
+"""Forces from UMA around the mutated positions: the original question, done directly.
 
 The question
 ------------
 Are the mutations more or less favourable according to what UMA computes?
 
-Why forces and not energies
----------------------------
-Total energy depends on atomic composition. Arg has more atoms than Ser, so
-E_total(S126R) and E_total(WT) are not comparable and any correlation with
-them reads the molecular weight. A force is local, in eV/A, and does not
-depend on how many atoms the system has. The force on the atoms around
-position 126 in one variant IS comparable to the same region in another.
+Why forces, not energies
+------------------------
+Total energy depends on composition. Arg has more atoms than Ser, so
+E(S126R) and E(WT) are not comparable and any correlation with them reads the
+molecular weight. A force is local, in eV/A, and does not care how many atoms
+the system has.
+
+Why spheres, not the whole protein
+----------------------------------
+The protonated protein is ~7,000 atoms and does not fit in 11 GB. It is also
+far outside the size range OMol25 was trained on. A sphere around the position
+of interest is both affordable and closer to the training regime.
 
 What the number means
 ---------------------
 MOE placed the mutated sidechains on a rigid backbone, without letting the
 surroundings respond. A residue that cannot sit there without strain carries
-large residual forces. That is a crude proxy for the steric cost of the
-substitution -- the same logic as clash detection in mutation scanning. It is
+large residual forces. That is a proxy for the steric cost of the substitution,
 not a free energy, and it partly measures how well MOE placed the sidechain.
 
-The control that makes it interpretable
----------------------------------------
-Asking "is the force large?" has no answer. So each position is scored against
-the force distribution of every other residue IN THE SAME STRUCTURE: the
-z-score of the mutated position within its own protein. Each variant is its
-own control and global differences normalise away.
+The control
+-----------
+"Is the force large?" has no answer on its own, so the same sphere calculation
+runs at N random OTHER positions in the SAME structure. The target is reported
+as a z-score within that null. Each variant is its own control.
 
 Usage
 -----
-    python scripts/uma_forces.py --pdb-dir data/raw --out data/processed/uma_forces.csv
+    python scripts/uma_forces.py --radius 10 --n-controls 20
 """
 
 import argparse
-import glob
 import os
+import random
 import re
 from pathlib import Path
 
@@ -44,40 +47,90 @@ VARIANTS = {"WT (4)": "WT", "D314A (1)": "D314A",
             "S126R (2)": "S126R", "S126-D314A (1)": "DOUBLE"}
 MUTATED = {"WT": [], "D314A": [314], "S126R": [126], "DOUBLE": [126, 314]}
 WATCH = [126, 314]
+BACKBONE = {"N", "CA", "C", "O", "OXT"}
 
 
-def protonate(pdb_in, pdb_out, ph=7.4):
-    """pdb2pqr adds the hydrogens an all-atom model needs and reports the charge."""
-    pqr = str(pdb_out).replace(".pdb", ".pqr")
-    cmd = (f'pdb2pqr30 --ff=AMBER --titration-state-method=propka --with-ph={ph} '
-           f'--keep-chain --pdb-output="{pdb_out}" "{pdb_in}" "{pqr}" 2>&1')
-    os.system(cmd)
-    charge = 0.0
-    if Path(pqr).exists():
-        for ln in open(pqr):
-            if ln.startswith(("ATOM", "HETATM")):
-                parts = ln.split()
-                try:
-                    charge += float(parts[-2])
-                except (ValueError, IndexError):
-                    pass
-    return pdb_out, int(round(charge))
+def protonate(pdb_in, out_stem):
+    pdb_out, pqr = f"{out_stem}.pdb", f"{out_stem}.pqr"
+    if not Path(pqr).exists():
+        os.system(f'pdb2pqr30 --ff=AMBER --titration-state-method=propka '
+                  f'--with-ph=7.4 --pdb-output="{pdb_out}" "{pdb_in}" "{pqr}" '
+                  f'>/dev/null 2>&1')
+    return pqr
 
 
-def read_atoms(path, drop_het=True):
-    syms, xyz, resnum = [], [], []
+def read_pqr(path):
+    """PQR carries per-atom charges, so the cluster charge is summed, not guessed."""
+    atoms = []
     for ln in open(path):
         if not ln.startswith(("ATOM", "HETATM")):
             continue
-        if drop_het and ln.startswith("HETATM"):
+        p = ln.split()
+        try:
+            x, y, z = float(p[-5]), float(p[-4]), float(p[-3])
+            q = float(p[-2])
+        except (ValueError, IndexError):
             continue
-        el = ln[76:78].strip()
-        if not el:
-            el = re.sub(r"[^A-Za-z]", "", ln[12:16].strip())[:1]
-        syms.append(el.capitalize())
-        xyz.append([float(ln[30:38]), float(ln[38:46]), float(ln[46:54])])
-        resnum.append(int(ln[22:26]))
-    return syms, np.array(xyz), np.array(resnum)
+        name = p[2]
+        el = re.sub(r"[^A-Za-z]", "", name)[:1].upper()
+        resnum = int(re.sub(r"[^0-9-]", "", p[-6])) if not p[-6].lstrip("-").isdigit() \
+            else int(p[-6])
+        atoms.append({"name": name, "el": el, "resnum": resnum,
+                      "xyz": np.array([x, y, z]), "q": q})
+    return atoms
+
+
+def cut_sphere(atoms, center_res, radius):
+    """Whole residues with any atom within `radius` of the centre residue's sidechain."""
+    core = [a for a in atoms if a["resnum"] == center_res]
+    side = [a for a in core if a["name"] not in BACKBONE] or core
+    if not core:
+        return None
+    centre = np.array([a["xyz"] for a in side])
+
+    keep = set()
+    for a in atoms:
+        if np.min(np.linalg.norm(centre - a["xyz"], axis=1)) <= radius:
+            keep.add(a["resnum"])
+
+    sel = [a for a in atoms if a["resnum"] in keep]
+
+    # cap broken peptide bonds with hydrogen along the original bond vector
+    caps = []
+    by_res = {}
+    for a in sel:
+        by_res.setdefault(a["resnum"], {})[a["name"]] = a
+    allres = {a["resnum"]: None for a in atoms}
+    for rn, d in by_res.items():
+        if rn - 1 in allres and rn - 1 not in keep and "N" in d:
+            prev_c = next((a for a in atoms
+                           if a["resnum"] == rn - 1 and a["name"] == "C"), None)
+            if prev_c is not None:
+                v = prev_c["xyz"] - d["N"]["xyz"]
+                v = v / np.linalg.norm(v)
+                caps.append({"el": "H", "xyz": d["N"]["xyz"] + 1.01 * v, "q": 0.0,
+                             "resnum": rn, "name": "HCAP"})
+        if rn + 1 in allres and rn + 1 not in keep and "C" in d:
+            nxt_n = next((a for a in atoms
+                          if a["resnum"] == rn + 1 and a["name"] == "N"), None)
+            if nxt_n is not None:
+                v = nxt_n["xyz"] - d["C"]["xyz"]
+                v = v / np.linalg.norm(v)
+                caps.append({"el": "H", "xyz": d["C"]["xyz"] + 1.09 * v, "q": 0.0,
+                             "resnum": rn, "name": "HCAP"})
+
+    full = sel + caps
+    charge = int(round(sum(a["q"] for a in full)))
+    return full, charge, len(keep)
+
+
+def max_force_on(atoms_list, forces, resnum):
+    idx = [i for i, a in enumerate(atoms_list)
+           if a["resnum"] == resnum and a["name"] not in BACKBONE
+           and a["name"] != "HCAP"]
+    if not idx:
+        idx = [i for i, a in enumerate(atoms_list) if a["resnum"] == resnum]
+    return float(np.linalg.norm(forces[idx], axis=1).max())
 
 
 def main():
@@ -87,13 +140,9 @@ def main():
     ap.add_argument("--out", default="data/processed/uma_forces.csv")
     ap.add_argument("--model", default="uma-s-1p1")
     ap.add_argument("--device", default="cuda")
-    ap.add_argument("--keep-metal", action="store_true",
-                    help="keep Fe and waters. Off by default: Fe in a high-spin "
-                         "state is open-shell, which is exactly the regime "
-                         "OMol25-class models are documented as untested on. "
-                         "Position 126 sits 12.9 A away, so dropping it barely "
-                         "touches the forces there; position 314 is 5.4 A away, "
-                         "so for that one rerun with this flag and compare.")
+    ap.add_argument("--radius", type=float, default=10.0)
+    ap.add_argument("--n-controls", type=int, default=20)
+    ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 
     try:
@@ -101,73 +150,82 @@ def main():
         from fairchem.core import pretrained_mlip, FAIRChemCalculator
         import pandas as pd
     except ModuleNotFoundError as e:
-        raise SystemExit(
-            f"falta {e.name}: este script corre en el entorno mlip.\n"
-            f"    bash scripts/setup_cluster.sh mlip\n"
-            f"    source ~/venvs/mlip/bin/activate\n"
-            f"    huggingface-cli login")
-    import shutil
-    if shutil.which("pdb2pqr30") is None:
-        raise SystemExit("falta pdb2pqr30 en el PATH: pip install pdb2pqr")
+        raise SystemExit(f"falta {e.name}: corré esto en el entorno mlip")
 
     Path(args.work).mkdir(parents=True, exist_ok=True)
     predictor = pretrained_mlip.get_predict_unit(args.model, device=args.device)
     calc = FAIRChemCalculator(predictor, task_name="omol")
-    print(f"loaded {args.model} on {args.device}\n")
+    print(f"{args.model} en {args.device}, esferas de {args.radius} A\n")
 
-    rows = []
+    rng = random.Random(args.seed)
+    rows, controls = [], None
+
     for stem, name in VARIANTS.items():
         src = Path(args.pdb_dir) / f"{stem}.pdb"
         if not src.exists():
-            print(f"missing {src}, skipping"); continue
-        prot = Path(args.work) / f"{name}_H.pdb"
-        if not prot.exists():
-            print(f"protonating {name} ...")
-        _, charge = protonate(src, prot)
+            print(f"falta {src}"); continue
+        pqr = protonate(src, str(Path(args.work) / name))
+        atoms_all = read_pqr(pqr)
+        positions = sorted({a["resnum"] for a in atoms_all})
 
-        syms, xyz, resnum = read_atoms(prot, drop_het=not args.keep_metal)
-        print(f"{name}: {len(syms)} atoms, net charge {charge:+d}")
+        if controls is None:   # same control positions for every variant
+            pool = [p for p in positions if p not in WATCH]
+            controls = rng.sample(pool, min(args.n_controls, len(pool)))
+            print(f"posiciones control: {sorted(controls)}\n")
 
-        atoms = Atoms(symbols=syms, positions=xyz)
-        atoms.info.update({"charge": charge, "spin": 1})
-        atoms.calc = calc
-        f = atoms.get_forces()
-        fmag = np.linalg.norm(f, axis=1)
-
-        # force per residue, then the z-score of each watched position within
-        # this structure's own distribution
-        per_res = {}
-        for r in np.unique(resnum):
-            per_res[int(r)] = float(fmag[resnum == r].max())
-        vals = np.array(list(per_res.values()))
-        mu, sd = vals.mean(), vals.std()
-
-        for pos in WATCH:
-            if pos not in per_res:
+        print(f"--- {name}")
+        for pos in WATCH + controls:
+            cut = cut_sphere(atoms_all, pos, args.radius)
+            if cut is None:
                 continue
-            rows.append({
-                "variant": name, "position": pos,
-                "mutated_here": pos in MUTATED[name],
-                "max_force_eV_per_A": round(per_res[pos], 4),
-                "z_within_structure": round((per_res[pos] - mu) / sd, 3),
-                "structure_median": round(float(np.median(vals)), 4),
-                "n_atoms": len(syms), "net_charge": charge,
-            })
-        print(f"   median per-residue max force {np.median(vals):.4f} eV/A")
-        for pos in WATCH:
-            if pos in per_res:
-                print(f"   position {pos}: {per_res[pos]:.4f} eV/A"
-                      f"   z = {(per_res[pos]-mu)/sd:+.2f}"
-                      f"   {'<- MUTATED' if pos in MUTATED[name] else ''}")
-        print()
+            sel, charge, nres = cut
+            a = Atoms(symbols=[x["el"] for x in sel],
+                      positions=np.array([x["xyz"] for x in sel]))
+            a.info.update({"charge": charge, "spin": 1})
+            a.calc = calc
+            try:
+                f = a.get_forces()
+            except Exception as e:
+                print(f"   pos {pos}: fallo ({type(e).__name__}); "
+                      f"{len(sel)} atomos. Probá --radius menor.")
+                continue
+            fm = max_force_on(sel, f, pos)
+            rows.append({"variant": name, "position": pos,
+                         "is_target": pos in WATCH,
+                         "mutated_here": pos in MUTATED[name],
+                         "max_force_eV_per_A": round(fm, 4),
+                         "n_atoms": len(sel), "n_residues": nres,
+                         "charge": charge})
+            if pos in WATCH:
+                print(f"   pos {pos}: {fm:.4f} eV/A   ({len(sel)} atomos, "
+                      f"carga {charge:+d}){'   <- MUTADA' if pos in MUTATED[name] else ''}")
 
     df = pd.DataFrame(rows)
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(args.out, index=False)
-    print(df.to_string(index=False))
-    print(f"\nwrote {args.out}")
-    print("\nThe comparison to make: does the z-score at a mutated position "
-          "track the measured plateau (WT 60, DOUBLE 48, D314A 47, S126R 22)?")
+
+    print("\n" + "=" * 62)
+    print("z-score de cada posicion dentro de su propia estructura")
+    print("=" * 62)
+    for name in VARIANTS.values():
+        g = df[df.variant == name]
+        if g.empty:
+            continue
+        ctrl = g[~g.is_target].max_force_eV_per_A
+        if len(ctrl) < 3:
+            continue
+        mu, sd = ctrl.mean(), ctrl.std()
+        print(f"{name:7s} (control: mediana {ctrl.median():.3f}, n={len(ctrl)})")
+        for pos in WATCH:
+            r = g[(g.position == pos) & g.is_target]
+            if r.empty:
+                continue
+            v = float(r.max_force_eV_per_A.iloc[0])
+            tag = "MUTADA" if bool(r.mutated_here.iloc[0]) else "wt"
+            print(f"    pos {pos}: {v:.3f} eV/A   z = {(v-mu)/sd:+.2f}   [{tag}]")
+    print(f"\nescrito {args.out}")
+    print("\nLa comparacion: el z-score de la posicion mutada, sigue el orden de "
+          "las mesetas medidas? (WT 60, DOUBLE 48, D314A 47, S126R 22)")
 
 
 if __name__ == "__main__":

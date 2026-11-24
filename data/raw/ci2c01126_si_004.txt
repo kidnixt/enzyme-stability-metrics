@@ -1,0 +1,1637 @@
+Descriptors	Library
+	
+Chi2v	RDKit
+	
+fr_Nhpyrrole	RDKit
+	
+BCUT2D_MRLOW	RDKit
+	
+BCUT2D_MWHI	RDKit
+	
+fr_isocyan	RDKit
+	
+MaxAbsPartialCharge	RDKit
+	
+NumRadicalElectrons	RDKit
+	
+SMR_VSA7	RDKit
+	
+LabuteASA	RDKit
+	
+Chi1v	RDKit
+	
+Chi0v	RDKit
+	
+VSA_EState1	RDKit
+	
+fr_guanido	RDKit
+	
+fr_azide	RDKit
+	
+EState_VSA9	RDKit
+	
+fr_alkyl_halide	RDKit
+	
+fr_Al_COO	RDKit
+	
+fr_Ar_N	RDKit
+	
+fr_pyridine	RDKit
+	
+Chi1	RDKit
+	
+NumHeteroatoms	RDKit
+	
+FpDensityMorgan1	RDKit
+	
+fr_aniline	RDKit
+	
+fr_methoxy	RDKit
+	
+fr_oxime	RDKit
+	
+fr_trimethylaniline	RDKit
+	
+SlogP_VSA7	RDKit
+	
+SlogP_VSA8	RDKit
+	
+fr_oxazole	RDKit
+	
+EState_VSA7	RDKit
+	
+fr_Ar_OH	RDKit
+	
+Chi2n	RDKit
+	
+Kappa3	RDKit
+	
+fr_benzodiazepine	RDKit
+	
+SlogP_VSA1	RDKit
+	
+BCUT2D_LOGPHI	RDKit
+	
+VSA_EState6	RDKit
+	
+NumSaturatedCarbocycles	RDKit
+	
+EState_VSA10	RDKit
+	
+SlogP_VSA6	RDKit
+	
+EState_VSA5	RDKit
+	
+fr_morpholine	RDKit
+	
+BCUT2D_MWLOW	RDKit
+	
+qed	RDKit
+	
+SlogP_VSA12	RDKit
+	
+fr_alkyl_carbamate	RDKit
+	
+fr_tetrazole	RDKit
+	
+fr_NH2	RDKit
+	
+fr_nitrile	RDKit
+	
+Chi3n	RDKit
+	
+fr_phenol_noOrthoHbond	RDKit
+	
+Kappa2	RDKit
+	
+EState_VSA6	RDKit
+	
+VSA_EState2	RDKit
+	
+fr_HOCCN	RDKit
+	
+MinAbsPartialCharge	RDKit
+	
+fr_ester	RDKit
+	
+HeavyAtomMolWt	RDKit
+	
+PEOE_VSA6	RDKit
+	
+BalabanJ	RDKit
+	
+NHOHCount	RDKit
+	
+SMR_VSA4	RDKit
+	
+MinEStateIndex	RDKit
+	
+fr_prisulfonamd	RDKit
+	
+SlogP_VSA10	RDKit
+	
+fr_NH1	RDKit
+	
+SlogP_VSA9	RDKit
+	
+fr_nitro_arom_nonortho	RDKit
+	
+Chi4n	RDKit
+	
+PEOE_VSA3	RDKit
+	
+PEOE_VSA9	RDKit
+	
+fr_phos_ester	RDKit
+	
+fr_furan	RDKit
+	
+NumAliphaticRings	RDKit
+	
+PEOE_VSA12	RDKit
+	
+SMR_VSA5	RDKit
+	
+Chi0n	RDKit
+	
+SMR_VSA1	RDKit
+	
+VSA_EState9	RDKit
+	
+Chi1n	RDKit
+	
+FpDensityMorgan3	RDKit
+	
+EState_VSA3	RDKit
+	
+EState_VSA11	RDKit
+	
+fr_dihydropyridine	RDKit
+	
+Ipc	RDKit
+	
+fr_priamide	RDKit
+	
+fr_unbrch_alkane	RDKit
+	
+fr_piperdine	RDKit
+	
+fr_phenol	RDKit
+	
+fr_Ndealkylation1	RDKit
+	
+BertzCT	RDKit
+	
+Chi0	RDKit
+	
+MinAbsEStateIndex	RDKit
+	
+NumRotatableBonds	RDKit
+	
+NumAromaticHeterocycles	RDKit
+	
+fr_imidazole	RDKit
+	
+fr_Ar_NH	RDKit
+	
+NumHAcceptors	RDKit
+	
+PEOE_VSA13	RDKit
+	
+fr_nitro_arom	RDKit
+	
+FractionCSP3	RDKit
+	
+fr_bicyclic	RDKit
+	
+Chi4v	RDKit
+	
+fr_halogen	RDKit
+	
+fr_sulfide	RDKit
+	
+Chi3v	RDKit
+	
+fr_COO	RDKit
+	
+BCUT2D_MRHI	RDKit
+	
+MolLogP	RDKit
+	
+fr_COO2	RDKit
+	
+EState_VSA8	RDKit
+	
+NOCount	RDKit
+	
+NumAliphaticCarbocycles	RDKit
+	
+fr_azo	RDKit
+	
+NumValenceElectrons	RDKit
+	
+NumHDonors	RDKit
+	
+fr_imide	RDKit
+	
+fr_sulfonamd	RDKit
+	
+fr_barbitur	RDKit
+	
+SMR_VSA9	RDKit
+	
+fr_NH0	RDKit
+	
+fr_Al_OH	RDKit
+	
+MaxEStateIndex	RDKit
+	
+PEOE_VSA11	RDKit
+	
+PEOE_VSA7	RDKit
+	
+EState_VSA1	RDKit
+	
+HeavyAtomCount	RDKit
+	
+fr_C_O_noCOO	RDKit
+	
+fr_amidine	RDKit
+	
+fr_piperzine	RDKit
+	
+fr_diazo	RDKit
+	
+FpDensityMorgan2	RDKit
+	
+fr_term_acetylene	RDKit
+	
+fr_thiocyan	RDKit
+	
+VSA_EState10	RDKit
+	
+fr_SH	RDKit
+	
+fr_ether	RDKit
+	
+TPSA	RDKit
+	
+SlogP_VSA5	RDKit
+	
+NumAliphaticHeterocycles	RDKit
+	
+BCUT2D_CHGHI	RDKit
+	
+SlogP_VSA2	RDKit
+	
+HallKierAlpha	RDKit
+	
+NumAromaticCarbocycles	RDKit
+	
+SlogP_VSA3	RDKit
+	
+ExactMolWt	RDKit
+	
+fr_nitro	RDKit
+	
+EState_VSA2	RDKit
+	
+fr_hdrzine	RDKit
+	
+MaxAbsEStateIndex	RDKit
+	
+fr_sulfone	RDKit
+	
+SMR_VSA6	RDKit
+	
+BCUT2D_CHGLO	RDKit
+	
+fr_clorobenzene	RDKit
+	
+fr_ketone	RDKit
+	
+BCUT2D_LOGPLOW	RDKit
+	
+RingCount	RDKit
+	
+PEOE_VSA5	RDKit
+	
+fr_thiazole	RDKit
+	
+SMR_VSA2	RDKit
+	
+fr_Imine	RDKit
+	
+VSA_EState8	RDKit
+	
+MaxPartialCharge	RDKit
+	
+fr_aldehyde	RDKit
+	
+fr_quatN	RDKit
+	
+fr_amide	RDKit
+	
+VSA_EState4	RDKit
+	
+VSA_EState5	RDKit
+	
+fr_Ar_COO	RDKit
+	
+fr_epoxide	RDKit
+	
+fr_Al_OH_noTert	RDKit
+	
+PEOE_VSA14	RDKit
+	
+fr_C_O	RDKit
+	
+PEOE_VSA4	RDKit
+	
+NumSaturatedRings	RDKit
+	
+fr_thiophene	RDKit
+	
+fr_hdrzone	RDKit
+	
+fr_sulph	RDKit
+	
+fr_nitroso	RDKit
+	
+fr_allylic_oxid	RDKit
+	
+MolMR	RDKit
+	
+fr_phos_acid	RDKit
+	
+fr_ketone_Topliss	RDKit
+	
+fr_lactam	RDKit
+	
+fr_N_O	RDKit
+	
+SMR_VSA8	RDKit
+	
+NumAromaticRings	RDKit
+	
+PEOE_VSA1	RDKit
+	
+VSA_EState7	RDKit
+	
+fr_para_hydroxylation	RDKit
+	
+MolWt	RDKit
+	
+SMR_VSA3	RDKit
+	
+fr_benzene	RDKit
+	
+fr_aryl_methyl	RDKit
+	
+VSA_EState3	RDKit
+	
+NumSaturatedHeterocycles	RDKit
+	
+fr_ArN	RDKit
+	
+Kappa1	RDKit
+	
+MinPartialCharge	RDKit
+	
+SlogP_VSA4	RDKit
+	
+EState_VSA4	RDKit
+	
+fr_Ndealkylation2	RDKit
+	
+PEOE_VSA2	RDKit
+	
+SlogP_VSA11	RDKit
+	
+fr_isothiocyan	RDKit
+	
+fr_lactone	RDKit
+	
+PEOE_VSA10	RDKit
+	
+fr_C_S	RDKit
+	
+SMR_VSA10	RDKit
+	
+PEOE_VSA8	RDKit
+	
+fr_dimetilbutane	RDKit
+	
+fr_urea	RDKit
+	
+ATS0dv	Mordred
+	
+ATS1dv	Mordred
+	
+ATS2dv	Mordred
+	
+ATS3dv	Mordred
+	
+ATS4dv	Mordred
+	
+ATS5dv	Mordred
+	
+ATS6dv	Mordred
+	
+ATS7dv	Mordred
+	
+ATS8dv	Mordred
+	
+ATS0d	Mordred
+	
+ATS1d	Mordred
+	
+ATS2d	Mordred
+	
+ATS3d	Mordred
+	
+ATS4d	Mordred
+	
+ATS5d	Mordred
+	
+ATS6d	Mordred
+	
+ATS7d	Mordred
+	
+ATS8d	Mordred
+	
+ATS0s	Mordred
+	
+ATS1s	Mordred
+	
+ATS2s	Mordred
+	
+ATS3s	Mordred
+	
+ATS4s	Mordred
+	
+ATS5s	Mordred
+	
+ATS6s	Mordred
+	
+ATS7s	Mordred
+	
+ATS8s	Mordred
+	
+ATS0Z	Mordred
+	
+ATS1Z	Mordred
+	
+ATS2Z	Mordred
+	
+ATS3Z	Mordred
+	
+ATS4Z	Mordred
+	
+ATS5Z	Mordred
+	
+ATS6Z	Mordred
+	
+ATS7Z	Mordred
+	
+ATS8Z	Mordred
+	
+ATS0m	Mordred
+	
+ATS1m	Mordred
+	
+ATS2m	Mordred
+	
+ATS3m	Mordred
+	
+ATS4m	Mordred
+	
+ATS5m	Mordred
+	
+ATS6m	Mordred
+	
+ATS7m	Mordred
+	
+ATS8m	Mordred
+	
+ATS0v	Mordred
+	
+ATS1v	Mordred
+	
+ATS2v	Mordred
+	
+ATS3v	Mordred
+	
+ATS4v	Mordred
+	
+ATS5v	Mordred
+	
+ATS6v	Mordred
+	
+ATS7v	Mordred
+	
+ATS8v	Mordred
+	
+ATS0se	Mordred
+	
+ATS1se	Mordred
+	
+ATS2se	Mordred
+	
+ATS3se	Mordred
+	
+ATS4se	Mordred
+	
+ATS5se	Mordred
+	
+ATS6se	Mordred
+	
+ATS7se	Mordred
+	
+ATS8se	Mordred
+	
+ATS0pe	Mordred
+	
+ATS1pe	Mordred
+	
+ATS2pe	Mordred
+	
+ATS3pe	Mordred
+	
+ATS4pe	Mordred
+	
+ATS5pe	Mordred
+	
+ATS6pe	Mordred
+	
+ATS7pe	Mordred
+	
+ATS8pe	Mordred
+	
+ATS0are	Mordred
+	
+ATS1are	Mordred
+	
+ATS2are	Mordred
+	
+ATS3are	Mordred
+	
+ATS4are	Mordred
+	
+ATS5are	Mordred
+	
+ATS6are	Mordred
+	
+ATS7are	Mordred
+	
+ATS8are	Mordred
+	
+ATS0p	Mordred
+	
+ATS1p	Mordred
+	
+ATS2p	Mordred
+	
+ATS3p	Mordred
+	
+ATS4p	Mordred
+	
+ATS5p	Mordred
+	
+ATS6p	Mordred
+	
+ATS7p	Mordred
+	
+ATS8p	Mordred
+	
+ATS0i	Mordred
+	
+ATS1i	Mordred
+	
+ATS2i	Mordred
+	
+ATS3i	Mordred
+	
+ATS4i	Mordred
+	
+ATS5i	Mordred
+	
+ATS6i	Mordred
+	
+ATS7i	Mordred
+	
+ATS8i	Mordred
+	
+AATS0dv	Mordred
+	
+AATS1dv	Mordred
+	
+AATS2dv	Mordred
+	
+AATS3dv	Mordred
+	
+AATS4dv	Mordred
+	
+AATS5dv	Mordred
+	
+AATS6dv	Mordred
+	
+AATS7dv	Mordred
+	
+AATS8dv	Mordred
+	
+AATS0d	Mordred
+	
+AATS1d	Mordred
+	
+AATS2d	Mordred
+	
+AATS3d	Mordred
+	
+AATS4d	Mordred
+	
+AATS5d	Mordred
+	
+AATS6d	Mordred
+	
+AATS7d	Mordred
+	
+AATS8d	Mordred
+	
+AATS0s	Mordred
+	
+AATS1s	Mordred
+	
+AATS2s	Mordred
+	
+AATS3s	Mordred
+	
+AATS4s	Mordred
+	
+AATS5s	Mordred
+	
+AATS6s	Mordred
+	
+AATS7s	Mordred
+	
+AATS8s	Mordred
+	
+AATS0Z	Mordred
+	
+AATS1Z	Mordred
+	
+AATS2Z	Mordred
+	
+AATS3Z	Mordred
+	
+AATS4Z	Mordred
+	
+AATS5Z	Mordred
+	
+AATS6Z	Mordred
+	
+AATS7Z	Mordred
+	
+AATS8Z	Mordred
+	
+AATS0m	Mordred
+	
+AATS1m	Mordred
+	
+AATS2m	Mordred
+	
+AATS3m	Mordred
+	
+AATS4m	Mordred
+	
+AATS5m	Mordred
+	
+AATS6m	Mordred
+	
+AATS7m	Mordred
+	
+AATS8m	Mordred
+	
+AATS0v	Mordred
+	
+AATS1v	Mordred
+	
+AATS2v	Mordred
+	
+AATS3v	Mordred
+	
+AATS4v	Mordred
+	
+AATS5v	Mordred
+	
+AATS6v	Mordred
+	
+AATS7v	Mordred
+	
+AATS8v	Mordred
+	
+AATS0se	Mordred
+	
+AATS1se	Mordred
+	
+AATS2se	Mordred
+	
+AATS3se	Mordred
+	
+AATS4se	Mordred
+	
+AATS5se	Mordred
+	
+AATS6se	Mordred
+	
+AATS7se	Mordred
+	
+AATS8se	Mordred
+	
+AATS0pe	Mordred
+	
+AATS1pe	Mordred
+	
+AATS2pe	Mordred
+	
+AATS3pe	Mordred
+	
+AATS4pe	Mordred
+	
+AATS5pe	Mordred
+	
+AATS6pe	Mordred
+	
+AATS7pe	Mordred
+	
+AATS8pe	Mordred
+	
+AATS0are	Mordred
+	
+AATS1are	Mordred
+	
+AATS2are	Mordred
+	
+AATS3are	Mordred
+	
+AATS4are	Mordred
+	
+AATS5are	Mordred
+	
+AATS6are	Mordred
+	
+AATS7are	Mordred
+	
+AATS8are	Mordred
+	
+AATS0p	Mordred
+	
+AATS1p	Mordred
+	
+AATS2p	Mordred
+	
+AATS3p	Mordred
+	
+AATS4p	Mordred
+	
+AATS5p	Mordred
+	
+AATS6p	Mordred
+	
+AATS7p	Mordred
+	
+AATS8p	Mordred
+	
+AATS0i	Mordred
+	
+AATS1i	Mordred
+	
+AATS2i	Mordred
+	
+AATS3i	Mordred
+	
+AATS4i	Mordred
+	
+AATS5i	Mordred
+	
+AATS6i	Mordred
+	
+AATS7i	Mordred
+	
+AATS8i	Mordred
+	
+ATSC0c	Mordred
+	
+ATSC1c	Mordred
+	
+ATSC2c	Mordred
+	
+ATSC3c	Mordred
+	
+ATSC4c	Mordred
+	
+ATSC5c	Mordred
+	
+ATSC6c	Mordred
+	
+ATSC7c	Mordred
+	
+ATSC8c	Mordred
+	
+ATSC0dv	Mordred
+	
+ATSC1dv	Mordred
+	
+ATSC2dv	Mordred
+	
+ATSC3dv	Mordred
+	
+ATSC4dv	Mordred
+	
+ATSC5dv	Mordred
+	
+ATSC6dv	Mordred
+	
+ATSC7dv	Mordred
+	
+ATSC8dv	Mordred
+	
+ATSC0d	Mordred
+	
+ATSC1d	Mordred
+	
+ATSC2d	Mordred
+	
+ATSC3d	Mordred
+	
+ATSC4d	Mordred
+	
+ATSC5d	Mordred
+	
+ATSC6d	Mordred
+	
+ATSC7d	Mordred
+	
+ATSC8d	Mordred
+	
+ATSC0s	Mordred
+	
+ATSC1s	Mordred
+	
+ATSC2s	Mordred
+	
+ATSC3s	Mordred
+	
+ATSC4s	Mordred
+	
+ATSC5s	Mordred
+	
+ATSC6s	Mordred
+	
+ATSC7s	Mordred
+	
+ATSC8s	Mordred
+	
+ATSC0Z	Mordred
+	
+ATSC1Z	Mordred
+	
+ATSC2Z	Mordred
+	
+ATSC3Z	Mordred
+	
+ATSC4Z	Mordred
+	
+ATSC5Z	Mordred
+	
+ATSC6Z	Mordred
+	
+ATSC7Z	Mordred
+	
+ATSC8Z	Mordred
+	
+ATSC0m	Mordred
+	
+ATSC1m	Mordred
+	
+ATSC2m	Mordred
+	
+ATSC3m	Mordred
+	
+ATSC4m	Mordred
+	
+ATSC5m	Mordred
+	
+ATSC6m	Mordred
+	
+ATSC7m	Mordred
+	
+ATSC8m	Mordred
+	
+ATSC0v	Mordred
+	
+ATSC1v	Mordred
+	
+ATSC2v	Mordred
+	
+ATSC3v	Mordred
+	
+ATSC4v	Mordred
+	
+ATSC5v	Mordred
+	
+ATSC6v	Mordred
+	
+ATSC7v	Mordred
+	
+ATSC8v	Mordred
+	
+ATSC0se	Mordred
+	
+ATSC1se	Mordred
+	
+ATSC2se	Mordred
+	
+ATSC3se	Mordred
+	
+ATSC4se	Mordred
+	
+ATSC5se	Mordred
+	
+ATSC6se	Mordred
+	
+ATSC7se	Mordred
+	
+ATSC8se	Mordred
+	
+ATSC0pe	Mordred
+	
+ATSC1pe	Mordred
+	
+ATSC2pe	Mordred
+	
+ATSC3pe	Mordred
+	
+ATSC4pe	Mordred
+	
+ATSC5pe	Mordred
+	
+ATSC6pe	Mordred
+	
+ATSC7pe	Mordred
+	
+ATSC8pe	Mordred
+	
+ATSC0are	Mordred
+	
+ATSC1are	Mordred
+	
+ATSC2are	Mordred
+	
+ATSC3are	Mordred
+	
+ATSC4are	Mordred
+	
+ATSC5are	Mordred
+	
+ATSC6are	Mordred
+	
+ATSC7are	Mordred
+	
+ATSC8are	Mordred
+	
+ATSC0p	Mordred
+	
+ATSC1p	Mordred
+	
+ATSC2p	Mordred
+	
+ATSC3p	Mordred
+	
+ATSC4p	Mordred
+	
+ATSC5p	Mordred
+	
+ATSC6p	Mordred
+	
+ATSC7p	Mordred
+	
+ATSC8p	Mordred
+	
+ATSC0i	Mordred
+	
+ATSC1i	Mordred
+	
+ATSC2i	Mordred
+	
+ATSC3i	Mordred
+	
+ATSC4i	Mordred
+	
+ATSC5i	Mordred
+	
+ATSC6i	Mordred
+	
+ATSC7i	Mordred
+	
+ATSC8i	Mordred
+	
+AATSC0c	Mordred
+	
+AATSC1c	Mordred
+	
+AATSC2c	Mordred
+	
+AATSC3c	Mordred
+	
+AATSC4c	Mordred
+	
+AATSC5c	Mordred
+	
+AATSC6c	Mordred
+	
+AATSC7c	Mordred
+	
+AATSC8c	Mordred
+	
+AATSC0dv	Mordred
+	
+AATSC1dv	Mordred
+	
+AATSC2dv	Mordred
+	
+AATSC3dv	Mordred
+	
+AATSC4dv	Mordred
+	
+AATSC5dv	Mordred
+	
+AATSC6dv	Mordred
+	
+AATSC7dv	Mordred
+	
+AATSC8dv	Mordred
+	
+AATSC0d	Mordred
+	
+AATSC1d	Mordred
+	
+AATSC2d	Mordred
+	
+AATSC3d	Mordred
+	
+AATSC4d	Mordred
+	
+AATSC5d	Mordred
+	
+AATSC6d	Mordred
+	
+AATSC7d	Mordred
+	
+AATSC8d	Mordred
+	
+AATSC0s	Mordred
+	
+AATSC1s	Mordred
+	
+AATSC2s	Mordred
+	
+AATSC3s	Mordred
+	
+AATSC4s	Mordred
+	
+AATSC5s	Mordred
+	
+AATSC6s	Mordred
+	
+AATSC7s	Mordred
+	
+AATSC8s	Mordred
+	
+AATSC0Z	Mordred
+	
+AATSC1Z	Mordred
+	
+AATSC2Z	Mordred
+	
+AATSC3Z	Mordred
+	
+AATSC4Z	Mordred
+	
+AATSC5Z	Mordred
+	
+AATSC6Z	Mordred
+	
+AATSC7Z	Mordred
+	
+AATSC8Z	Mordred
+	
+AATSC0m	Mordred
+	
+AATSC1m	Mordred
+	
+AATSC2m	Mordred
+	
+AATSC3m	Mordred
+	
+AATSC4m	Mordred
+	
+AATSC5m	Mordred
+	
+AATSC6m	Mordred
+	
+AATSC7m	Mordred
+	
+AATSC8m	Mordred
+	
+AATSC0v	Mordred
+	
+AATSC1v	Mordred
+	
+AATSC2v	Mordred
+	
+AATSC3v	Mordred
+	
+AATSC4v	Mordred
+	
+AATSC5v	Mordred
+	
+AATSC6v	Mordred
+	
+AATSC7v	Mordred
+	
+AATSC8v	Mordred
+	
+AATSC0se	Mordred
+	
+AATSC1se	Mordred
+	
+AATSC2se	Mordred
+	
+AATSC3se	Mordred
+	
+AATSC4se	Mordred
+	
+AATSC5se	Mordred
+	
+AATSC6se	Mordred
+	
+AATSC7se	Mordred
+	
+AATSC8se	Mordred
+	
+AATSC0pe	Mordred
+	
+AATSC1pe	Mordred
+	
+AATSC2pe	Mordred
+	
+AATSC3pe	Mordred
+	
+AATSC4pe	Mordred
+	
+AATSC5pe	Mordred
+	
+AATSC6pe	Mordred
+	
+AATSC7pe	Mordred
+	
+AATSC8pe	Mordred
+	
+AATSC0are	Mordred
+	
+AATSC1are	Mordred
+	
+AATSC2are	Mordred
+	
+AATSC3are	Mordred
+	
+AATSC4are	Mordred
+	
+AATSC5are	Mordred
+	
+AATSC6are	Mordred
+	
+AATSC7are	Mordred
+	
+AATSC8are	Mordred
+	
+AATSC0p	Mordred
+	
+AATSC1p	Mordred
+	
+AATSC2p	Mordred
+	
+AATSC3p	Mordred
+	
+AATSC4p	Mordred
+	
+AATSC5p	Mordred
+	
+AATSC6p	Mordred
+	
+AATSC7p	Mordred
+	
+AATSC8p	Mordred
+	
+AATSC0i	Mordred
+	
+AATSC1i	Mordred
+	
+AATSC2i	Mordred
+	
+AATSC3i	Mordred
+	
+AATSC4i	Mordred
+	
+AATSC5i	Mordred
+	
+AATSC6i	Mordred
+	
+AATSC7i	Mordred
+	
+AATSC8i	Mordred
+	
+MATS1c	Mordred
+	
+MATS2c	Mordred
+	
+MATS3c	Mordred
+	
+MATS4c	Mordred
+	
+MATS5c	Mordred
+	
+MATS6c	Mordred
+	
+MATS7c	Mordred
+	
+MATS8c	Mordred
+	
+MATS1dv	Mordred
+	
+MATS2dv	Mordred
+	
+MATS3dv	Mordred
+	
+MATS4dv	Mordred
+	
+MATS5dv	Mordred
+	
+MATS6dv	Mordred
+	
+MATS7dv	Mordred
+	
+MATS8dv	Mordred
+	
+MATS1d	Mordred
+	
+MATS2d	Mordred
+	
+MATS3d	Mordred
+	
+MATS4d	Mordred
+	
+MATS5d	Mordred
+	
+MATS6d	Mordred
+	
+MATS7d	Mordred
+	
+MATS8d	Mordred
+	
+MATS1s	Mordred
+	
+MATS2s	Mordred
+	
+MATS3s	Mordred
+	
+MATS4s	Mordred
+	
+MATS5s	Mordred
+	
+MATS6s	Mordred
+	
+MATS7s	Mordred
+	
+MATS8s	Mordred
+	
+MATS1Z	Mordred
+	
+MATS2Z	Mordred
+	
+MATS3Z	Mordred
+	
+MATS4Z	Mordred
+	
+MATS5Z	Mordred
+	
+MATS6Z	Mordred
+	
+MATS7Z	Mordred
+	
+MATS8Z	Mordred
+	
+MATS1m	Mordred
+	
+MATS2m	Mordred
+	
+MATS3m	Mordred
+	
+MATS4m	Mordred
+	
+MATS5m	Mordred
+	
+MATS6m	Mordred
+	
+MATS7m	Mordred
+	
+MATS8m	Mordred
+	
+MATS1v	Mordred
+	
+MATS2v	Mordred
+	
+MATS3v	Mordred
+	
+MATS4v	Mordred
+	
+MATS5v	Mordred
+	
+MATS6v	Mordred
+	
+MATS7v	Mordred
+	
+MATS8v	Mordred
+	
+MATS1se	Mordred
+	
+MATS2se	Mordred
+	
+MATS3se	Mordred
+	
+MATS4se	Mordred
+	
+MATS5se	Mordred
+	
+MATS6se	Mordred
+	
+MATS7se	Mordred
+	
+MATS8se	Mordred
+	
+MATS1pe	Mordred
+	
+MATS2pe	Mordred
+	
+MATS3pe	Mordred
+	
+MATS4pe	Mordred
+	
+MATS5pe	Mordred
+	
+MATS6pe	Mordred
+	
+MATS7pe	Mordred
+	
+MATS8pe	Mordred
+	
+MATS1are	Mordred
+	
+MATS2are	Mordred
+	
+MATS3are	Mordred
+	
+MATS4are	Mordred
+	
+MATS5are	Mordred
+	
+MATS6are	Mordred
+	
+MATS7are	Mordred
+	
+MATS8are	Mordred
+	
+MATS1p	Mordred
+	
+MATS2p	Mordred
+	
+MATS3p	Mordred
+	
+MATS4p	Mordred
+	
+MATS5p	Mordred
+	
+MATS6p	Mordred
+	
+MATS7p	Mordred
+	
+MATS8p	Mordred
+	
+MATS1i	Mordred
+	
+MATS2i	Mordred
+	
+MATS3i	Mordred
+	
+MATS4i	Mordred
+	
+MATS5i	Mordred
+	
+MATS6i	Mordred
+	
+MATS7i	Mordred
+	
+MATS8i	Mordred
+	
+GATS1c	Mordred
+	
+GATS2c	Mordred
+	
+GATS3c	Mordred
+	
+GATS4c	Mordred
+	
+GATS5c	Mordred
+	
+GATS6c	Mordred
+	
+GATS7c	Mordred
+	
+GATS8c	Mordred
+	
+GATS1dv	Mordred
+	
+GATS2dv	Mordred
+	
+GATS3dv	Mordred
+	
+GATS4dv	Mordred
+	
+GATS5dv	Mordred
+	
+GATS6dv	Mordred
+	
+GATS7dv	Mordred
+	
+GATS8dv	Mordred
+	
+GATS1d	Mordred
+	
+GATS2d	Mordred
+	
+GATS3d	Mordred
+	
+GATS4d	Mordred
+	
+GATS5d	Mordred
+	
+GATS6d	Mordred
+	
+GATS7d	Mordred
+	
+GATS8d	Mordred
+	
+GATS1s	Mordred
+	
+GATS2s	Mordred
+	
+GATS3s	Mordred
+	
+GATS4s	Mordred
+	
+GATS5s	Mordred
+	
+GATS6s	Mordred
+	
+GATS7s	Mordred
+	
+GATS8s	Mordred
+	
+GATS1Z	Mordred
+	
+GATS2Z	Mordred
+	
+GATS3Z	Mordred
+	
+GATS4Z	Mordred
+	
+GATS5Z	Mordred
+	
+GATS6Z	Mordred
+	
+GATS7Z	Mordred
+	
+GATS8Z	Mordred
+	
+GATS1m	Mordred
+	
+GATS2m	Mordred
+	
+GATS3m	Mordred
+	
+GATS4m	Mordred
+	
+GATS5m	Mordred
+	
+GATS6m	Mordred
+	
+GATS7m	Mordred
+	
+GATS8m	Mordred
+	
+GATS1v	Mordred
+	
+GATS2v	Mordred
+	
+GATS3v	Mordred
+	
+GATS4v	Mordred
+	
+GATS5v	Mordred
+	
+GATS6v	Mordred
+	
+GATS7v	Mordred
+	
+GATS8v	Mordred
+	
+GATS1se	Mordred
+	
+GATS2se	Mordred
+	
+GATS3se	Mordred
+	
+GATS4se	Mordred
+	
+GATS5se	Mordred
+	
+GATS6se	Mordred
+	
+GATS7se	Mordred
+	
+GATS8se	Mordred
+	
+GATS1pe	Mordred
+	
+GATS2pe	Mordred
+	
+GATS3pe	Mordred
+	
+GATS4pe	Mordred
+	
+GATS5pe	Mordred
+	
+GATS6pe	Mordred
+	
+GATS7pe	Mordred
+	
+GATS8pe	Mordred
+	
+GATS1are	Mordred
+	
+GATS2are	Mordred
+	
+GATS3are	Mordred
+	
+GATS4are	Mordred
+	
+GATS5are	Mordred
+	
+GATS6are	Mordred
+	
+GATS7are	Mordred
+	
+GATS8are	Mordred
+	
+GATS1p	Mordred
+	
+GATS2p	Mordred
+	
+GATS3p	Mordred
+	
+GATS4p	Mordred
+	
+GATS5p	Mordred
+	
+GATS6p	Mordred
+	
+GATS7p	Mordred
+	
+GATS8p	Mordred
+	
+GATS1i	Mordred
+	
+GATS2i	Mordred
+	
+GATS3i	Mordred
+	
+GATS4i	Mordred
+	
+GATS5i	Mordred
+	
+GATS6i	Mordred
+	
+GATS7i	Mordred
+	
+GATS8i	Mordred
