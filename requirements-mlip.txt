@@ -1,9 +1,14 @@
 # X3 (clusteres de sitio activo con UMA). Entorno SEPARADO del de analisis:
 # fairchem arrastra su propia version de torch y rompe entornos mezclados.
 # Instalar DESPUES de torch con el CUDA correcto para el cluster.
-fairchem-core>=2.14
+# Tope en 2.22 a proposito: desde esa version fairchem pide torch~=2.13, que
+# viene con CUDA 13 y necesita driver 580+. El cluster tiene driver de la serie
+# 575, asi que torch no puede inicializar la GPU y reporta cuda=False.
+# 2.20.0 pide torch~=2.8 (CUDA 12), que si funciona ahi.
+fairchem-core>=2.14,<2.22
 ase
 huggingface_hub
 pdb2pqr        # protonacion + tautomeros de histidina via PROPKA
 numpy
 pandas
+ipykernel

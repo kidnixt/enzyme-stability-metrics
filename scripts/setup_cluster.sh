@@ -34,10 +34,10 @@ case "$WHICH" in
     pip install -r "$REPO/requirements-plm.txt"
     ;;
   mlip)
-    # torch primero, con el build de CUDA que corresponda. El driver del cluster
-    # es 12.9; las ruedas cu124 funcionan (los drivers son compatibles hacia
-    # adelante). Si falla, probar cu121.
-    pip install torch --index-url https://download.pytorch.org/whl/cu124
+    # NO instalar torch aparte: fairchem-core fija su propia version y la pisa.
+    # Instalamos fairchem y dejamos que resuelva torch; despues verificamos que
+    # la GPU siga siendo visible, porque la version que elija puede traer
+    # librerias de CUDA que ya no soporten arquitecturas viejas.
     pip install -r "$REPO/requirements-mlip.txt"
     ;;
   *)
@@ -58,5 +58,5 @@ echo ">>> listo. Kernel de Jupyter: 'enzyme-stability ($WHICH)'"
         y NO se puede editar despues de enviarlo)
     3) crear un token en https://huggingface.co/settings/tokens
        con permiso de lectura sobre repos gated
-    4) huggingface-cli login
+    4) hf auth login     (huggingface-cli quedo deprecado y no hace nada)
 MSG
