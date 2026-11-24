@@ -3,6 +3,11 @@ __pycache__/
 .ipynb_checkpoints/
 data/processed/*
 !data/processed/.gitkeep
+# Resultados chicos que cuestan una corrida de GPU: se versionan.
+# La matriz de descriptores no, son 6 MB y se regenera en minutos de CPU.
+!data/processed/uma_forces.csv
+!data/processed/uma_forces_r9.csv
+!data/processed/mol_quantum.csv
 wandb/
 *.pt
 *.ckpt
