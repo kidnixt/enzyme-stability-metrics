@@ -1,82 +1,105 @@
-"""Read ThermoMPNN single-mutant output and set up the comparison.
+"""Extract the ThermoMPNN predictions for our two mutations and their double.
 
-Produces, for D314A and S126R:
-  - the predicted ddG
-  - where each sits among all 8,460 predicted mutations (percentile)
-  - the additive prediction for the double, which is what any additive model
-    must say
-and contrasts the resulting ranking with the measured A_inf ordering.
+Mutation string formats, learned from the actual output:
+  single file : {chain}{wt}{pos}{mut}      e.g. "AD314A"  (PDB numbering)
+  pairs file  : {wt}{pos}{mut}:{wt}{pos}{mut}  with 0-based sequence indices,
+                because the targeted driver skips the renumbering step
 
-Robust to the exact Mutation string format: it reports the columns and a
-sample, then locates the mutations by regex on position and amino acids.
+Canonical position p maps to sequence index p - 4 (structures start at 4).
 
-    python scripts/thermompnn_compare.py --single ~/thermompnn_single.csv
+    python scripts/thermompnn_compare.py --single ~/thermompnn_single.csv \
+        [--pairs data/processed/thermompnn_pairs.csv]
 """
 
 import argparse
-import re
 
 import pandas as pd
 
 MEASURED_A_INF = {"WT": 60.0, "D314A": 47.0, "S126R": 22.1, "DOUBLE": 48.4}
+FIRST_RESIDUE = 4
 TARGETS = {"D314A": ("D", 314, "A"), "S126R": ("S", 126, "R")}
 
 
-def find_mutation(df, col, wt, pos, mut):
-    """Match e.g. D314A however the column spells it."""
-    pat = re.compile(rf"\b{wt}\s*{pos}\s*{mut}\b", re.I)
-    hit = df[df[col].astype(str).str.contains(pat, na=False)]
-    if len(hit) == 0:   # fall back: just the position, let the caller look
-        pat2 = re.compile(rf"{wt}{pos}", re.I)
-        return df[df[col].astype(str).str.contains(pat2, na=False)], False
-    return hit, True
+def seq_index(canonical):
+    return canonical - FIRST_RESIDUE
+
+
+def cols_of(df):
+    mut = next(c for c in df.columns if "mutation" in c.lower())
+    ddg = next(c for c in df.columns if "ddg" in c.lower())
+    return mut, ddg
+
+
+def do_single(path):
+    df = pd.read_csv(path)
+    mut_col, ddg_col = cols_of(df)
+    print(f"--- singles: {len(df)} rows, format e.g. {df[mut_col].iloc[1]!r}\n")
+
+    found = {}
+    for name, (wt, pos, mut) in TARGETS.items():
+        # chain prefix may or may not be there, so anchor at the end
+        hit = df[df[mut_col].astype(str).str.endswith(f"{wt}{pos}{mut}")]
+        if len(hit) != 1:
+            print(f"{name}: {len(hit)} matches; rows at position {pos}:")
+            print(df[df[mut_col].astype(str).str.contains(f"{wt}{pos}",
+                                                          na=False)].to_string())
+            continue
+        ddg = float(hit.iloc[0][ddg_col])
+        pctile = (df[ddg_col] < ddg).mean() * 100
+        found[name] = ddg
+        print(f"{name:7s}  ddG = {ddg:+7.3f} kcal/mol"
+              f"   (percentile {pctile:5.1f} of {len(df)} mutations)")
+
+    if len(found) == 2:
+        additive = found["D314A"] + found["S126R"]
+        print(f"\nDOUBLE additive = {additive:+7.3f} kcal/mol"
+              "   (what any additive model must say)")
+        pred = {"WT": 0.0, **found, "DOUBLE": additive}
+        print("\npredicted ranking (least destabilising first):")
+        print("   " + " > ".join(sorted(pred, key=lambda v: -pred[v])))
+        print("measured ranking  (most robust first):")
+        print("   " + " > ".join(sorted(MEASURED_A_INF,
+                                        key=lambda v: -MEASURED_A_INF[v])))
+        return found, additive
+    return found, None
+
+
+def do_pairs(path, additive):
+    df = pd.read_csv(path)
+    mut_col, ddg_col = cols_of(df)
+    print(f"\n--- pairs: {len(df)} rows, format e.g. {df[mut_col].iloc[0]!r}")
+
+    a, b = seq_index(126), seq_index(314)
+    s = df[mut_col].astype(str)
+    both = df[s.str.contains(f"S{a}R", na=False) & s.str.contains(f"D{b}A", na=False)]
+    print(f"rows with S{a}R and D{b}A together: {len(both)}")
+
+    if len(both) == 0:
+        at_a = df[s.str.contains(f"{a}", na=False)]
+        print(f"\nrows mentioning index {a} at all: {len(at_a)}")
+        print(at_a.head(10).to_string())
+        print("\nfirst rows of the file, to read the real format:")
+        print(df.head(10).to_string())
+        return
+
+    ddg_epi = float(both.iloc[0][ddg_col])
+    print(f"\nepistatic ddG for the real double = {ddg_epi:+7.3f} kcal/mol")
+    if additive is not None:
+        print(f"additive  ddG                     = {additive:+7.3f} kcal/mol")
+        print(f"PREDICTED EPISTASIS               = {ddg_epi - additive:+7.3f}")
+        print("\nmeasured: the double behaves like D314A alone, far better than"
+              " the sum of its parts")
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--single", required=True)
+    ap.add_argument("--pairs")
     args = ap.parse_args()
 
-    df = pd.read_csv(args.single)
-    print(f"{len(df)} rows")
-    print(f"columns: {list(df.columns)}\n")
-    print("sample rows:")
-    print(df.head(5).to_string(), "\n")
-
-    mut_col = next((c for c in df.columns if "mutation" in c.lower()), df.columns[-1])
-    ddg_col = next((c for c in df.columns if "ddg" in c.lower()), None)
-    if ddg_col is None:
-        raise SystemExit(f"no ddG column found among {list(df.columns)}")
-    print(f"using mutation column '{mut_col}', ddG column '{ddg_col}'\n")
-
-    found = {}
-    for name, (wt, pos, mut) in TARGETS.items():
-        hit, exact = find_mutation(df, mut_col, wt, pos, mut)
-        if not exact:
-            print(f"{name}: no exact match. Rows at position {pos}:")
-            print(hit.head(25).to_string(), "\n")
-            continue
-        row = hit.iloc[0]
-        ddg = float(row[ddg_col])
-        pctile = (df[ddg_col] < ddg).mean() * 100
-        found[name] = ddg
-        print(f"{name:7s}  ddG = {ddg:+7.3f} kcal/mol"
-              f"   (percentile {pctile:5.1f} of all {len(df)} mutations)")
-
-    if len(found) == 2:
-        additive = found["D314A"] + found["S126R"]
-        print(f"\nDOUBLE, additive prediction = {additive:+7.3f} kcal/mol")
-        print("   any additive model must say exactly this; the epistatic model"
-              " is free to differ")
-
-        pred = {"WT": 0.0, "D314A": found["D314A"], "S126R": found["S126R"],
-                "DOUBLE": additive}
-        print("\nranking, predicted (least destabilising first):")
-        print("   " + " > ".join(sorted(pred, key=lambda v: -pred[v])))
-        print("ranking, measured (most robust first):")
-        print("   " + " > ".join(sorted(MEASURED_A_INF,
-                                        key=lambda v: -MEASURED_A_INF[v])))
-        print("\nmeasured A_inf:", {k: MEASURED_A_INF[k] for k in MEASURED_A_INF})
+    _, additive = do_single(args.single)
+    if args.pairs:
+        do_pairs(args.pairs, additive)
 
 
 if __name__ == "__main__":
