@@ -96,9 +96,19 @@ def main():
                          "so for that one rerun with this flag and compare.")
     args = ap.parse_args()
 
-    from ase import Atoms
-    from fairchem.core import pretrained_mlip, FAIRChemCalculator
-    import pandas as pd
+    try:
+        from ase import Atoms
+        from fairchem.core import pretrained_mlip, FAIRChemCalculator
+        import pandas as pd
+    except ModuleNotFoundError as e:
+        raise SystemExit(
+            f"falta {e.name}: este script corre en el entorno mlip.\n"
+            f"    bash scripts/setup_cluster.sh mlip\n"
+            f"    source ~/venvs/mlip/bin/activate\n"
+            f"    huggingface-cli login")
+    import shutil
+    if shutil.which("pdb2pqr30") is None:
+        raise SystemExit("falta pdb2pqr30 en el PATH: pip install pdb2pqr")
 
     Path(args.work).mkdir(parents=True, exist_ok=True)
     predictor = pretrained_mlip.get_predict_unit(args.model, device=args.device)

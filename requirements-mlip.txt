@@ -4,4 +4,6 @@
 fairchem-core>=2.14
 ase
 huggingface_hub
+pdb2pqr        # protonacion + tautomeros de histidina via PROPKA
 numpy
+pandas
