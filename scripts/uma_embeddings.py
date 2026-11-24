@@ -183,12 +183,46 @@ def main():
 
     buf = {}
 
+    def pick(out, n_at):
+        """El backbone no devuelve un tensor pelado sino una estructura.
+
+        Se busca adentro el tensor que tenga una fila por atomo, que es la
+        representacion por atomo. Se devuelve tambien de donde salio, para no
+        quedarse adivinando que se agarro.
+        """
+        cands = []
+
+        def walk(o, path):
+            if isinstance(o, torch.Tensor):
+                cands.append((path, o))
+            elif isinstance(o, dict):
+                for k, v in o.items():
+                    walk(v, f"{path}.{k}" if path else str(k))
+            elif isinstance(o, (tuple, list)):
+                for i, v in enumerate(o):
+                    walk(v, f"{path}[{i}]" if path else f"[{i}]")
+            elif hasattr(o, "__dict__"):
+                for k, v in vars(o).items():
+                    if isinstance(v, (torch.Tensor, dict, tuple, list)):
+                        walk(v, f"{path}.{k}" if path else str(k))
+
+        walk(out, "")
+        exact = [(p_, t) for p_, t in cands
+                 if t.ndim in (2, 3) and t.shape[0] == n_at]
+        if exact:
+            # el de mas dimensiones primero: (n, S, D) antes que (n, D)
+            exact.sort(key=lambda pt: -pt[1].ndim)
+            return exact[0]
+        return (None, None)
+
     def hook(mod, inp, out):
-        t = out
-        if isinstance(t, (tuple, list)) and t:
-            t = t[0]
-        if isinstance(t, torch.Tensor):
-            buf["x"] = t.detach().float().cpu().numpy()
+        buf["raw"] = out
+
+    def grab(n_at):
+        path, t = pick(buf.get("raw"), n_at)
+        if t is None:
+            return None, None
+        return path, t.detach().float().cpu().numpy()
 
     def invariants(x):
         """De (n_atomos, S, D) o (n_atomos, D) a (n_atomos, K) invariante.
@@ -228,8 +262,14 @@ def main():
             m = mols[0]
             a = to_atoms(m)
             a.get_potential_energy()
-            f1 = fingerprint(buf["x"], pools)
-            raw1 = buf["x"].copy()
+            path, x1 = grab(len(a))
+            if x1 is None:
+                raise SystemExit(
+                    "el hook no devolvio ningun tensor con una fila por atomo. "
+                    "Pegame la salida de --inspect de nuevo.")
+            print(f"tensor tomado de: {path}   forma {x1.shape}\n")
+            f1 = fingerprint(x1, pools)
+            raw1 = x1.copy()
 
             rng = np.random.default_rng(0)
             q = rng.normal(size=(3, 3))
@@ -240,8 +280,8 @@ def main():
             b.set_positions(b.get_positions() @ R.T)
             b.calc = calc
             b.get_potential_energy()
-            f2 = fingerprint(buf["x"], pools)
-            raw2 = buf["x"]
+            _, raw2 = grab(len(b))
+            f2 = fingerprint(raw2, pools)
         finally:
             h.remove()
 
@@ -275,8 +315,8 @@ def main():
             try:
                 a = to_atoms(m)
                 a.get_potential_energy()
-                x = buf.get("x")
-                if x is None or x.shape[0] != len(a):
+                _, x = grab(len(a))
+                if x is None:
                     n_err += 1
                     continue
                 feats = fingerprint(x, pools)
