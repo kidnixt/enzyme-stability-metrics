@@ -39,6 +39,12 @@ El grupo "roto" se define por donde falla la cabeza de 1p1, que es una
 cantidad distinta de la que se mide despues (la precision de la sonda), asi
 que no hay circularidad.
 
+Con --strict los pliegues no son al azar sino por familia quimica: se agrupan
+las moleculas por similitud estructural y se deja cada familia ENTERA afuera.
+Sin eso, al retirar un sulfonato quedan sus hermanos en entrenamiento y la
+sonda puede acertar por vecindad. La version estricta pregunta algo mas duro y
+mas util: la representacion acierta en quimica que nunca vio?
+
 Uso:
     python scripts/uma_embeddings.py --layer module.backbone --model uma-s-1p1 \\
         --out data/processed/mol_embeddings_1p1.csv
@@ -75,6 +81,10 @@ def main():
     ap.add_argument("--q1p1", default="data/processed/mol_quantum.csv")
     ap.add_argument("--q1p2", default="data/processed/mol_quantum_1p2.csv")
     ap.add_argument("--broken-eV", type=float, default=1.0)
+    ap.add_argument("--strict", action="store_true",
+                    help="dejar familias quimicas enteras afuera, no moleculas sueltas")
+    ap.add_argument("--tanimoto", type=float, default=0.6,
+                    help="corte de similitud para armar las familias")
     args = ap.parse_args()
 
     q1 = pd.read_csv(args.q1p1)[["mol_id", "smiles", "IE_eV"]].rename(
@@ -97,9 +107,42 @@ def main():
           f"{broken.sum()} ({broken.mean()*100:.1f}%)")
     print(f"grupo sano: {(~broken).sum()}\n")
 
-    cv = KFold(5, shuffle=True, random_state=0)
-    p_true = cross_val_predict(probe(), X1, true, cv=cv)
-    p_head = cross_val_predict(probe(), X1, head, cv=cv)
+    if args.strict:
+        # Agrupar por similitud estructural y dejar grupos ENTEROS afuera. Con
+        # pliegues al azar, al retirar un sulfonato quedan sus diez hermanos en
+        # entrenamiento, asi que la sonda puede acertar por vecindad en vez de
+        # por entender la quimica. Esto lo impide.
+        from rdkit import Chem, RDLogger
+        from rdkit.Chem import rdFingerprintGenerator
+        from rdkit.ML.Cluster import Butina
+        from rdkit import DataStructs
+        from sklearn.model_selection import LeaveOneGroupOut
+        RDLogger.DisableLog("rdApp.*")
+
+        gen = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
+        fps = [gen.GetFingerprint(Chem.MolFromSmiles(s_)) for s_ in d.smiles]
+        dists = []
+        for i in range(1, len(fps)):
+            sims = DataStructs.BulkTanimotoSimilarity(fps[i], fps[:i])
+            dists.extend(1 - x for x in sims)
+        clusters = Butina.ClusterData(dists, len(fps), 1 - args.tanimoto,
+                                      isDistData=True)
+        groups = np.empty(len(fps), dtype=int)
+        for gi, cl in enumerate(clusters):
+            for i in cl:
+                groups[i] = gi
+        sizes = pd.Series(groups).value_counts()
+        print(f"MODO ESTRICTO: {len(clusters)} familias quimicas "
+              f"(Tanimoto {args.tanimoto}); la mayor tiene {sizes.iloc[0]}")
+        print(f"   familias que tocan el grupo roto: "
+              f"{len(set(groups[broken]))}\n")
+        cv = LeaveOneGroupOut()
+        p_true = cross_val_predict(probe(), X1, true, cv=cv, groups=groups)
+        p_head = cross_val_predict(probe(), X1, head, cv=cv, groups=groups)
+    else:
+        cv = KFold(5, shuffle=True, random_state=0)
+        p_true = cross_val_predict(probe(), X1, true, cv=cv)
+        p_head = cross_val_predict(probe(), X1, head, cv=cv)
 
     print("=" * 72)
     print("Error absoluto medio contra la verdad (IE de 1p2, validada vs DFT)")
