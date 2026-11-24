@@ -115,7 +115,10 @@ def main():
     ap.add_argument("--pdb", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--n-random", type=int, default=280)
-    ap.add_argument("--batch-size", type=int, default=2048)
+    ap.add_argument("--batch-size", type=int, default=256,
+                    help="el 2048 del README esta medido sobre una proteina de 36 "
+                         "residuos; el tensor de aristas escala con el largo, asi que "
+                         "en una de 423 hay que bajarlo o se va de memoria")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--stratify", action="store_true", default=True)
     args = ap.parse_args()
