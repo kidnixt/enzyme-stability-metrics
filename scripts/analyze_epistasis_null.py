@@ -75,6 +75,39 @@ def main():
                   " is underpowered, rerun with more pairs")
     print()
 
+    # --- IS IT REALLY 3D DISTANCE, OR JUST SEQUENCE PROXIMITY?
+    # Residues close in space are often close in sequence too (a helix turn is
+    # i, i+3-4). A transformer attending locally in sequence would produce the
+    # same apparent decay with no spatial knowledge at all. These two checks
+    # separate the explanations.
+    print("-" * 64)
+    print("CONFOUND CHECK: 3D distance vs sequence separation")
+    r_de, _ = spearmanr(df.ca_distance, df.abs_epistasis)
+    r_se, _ = spearmanr(df.seq_separation, df.abs_epistasis)
+    r_ds, _ = spearmanr(df.ca_distance, df.seq_separation)
+    print(f"  rho(3D distance, |epistasis|)      = {r_de:+.3f}")
+    print(f"  rho(seq separation, |epistasis|)   = {r_se:+.3f}")
+    print(f"  rho(3D distance, seq separation)   = {r_ds:+.3f}   <- how entangled they are")
+
+    denom = np.sqrt((1 - r_ds ** 2) * (1 - r_se ** 2))
+    partial = (r_de - r_ds * r_se) / denom if denom > 0 else float("nan")
+    print(f"  PARTIAL rho(3D distance, |epistasis| | seq separation) = {partial:+.3f}")
+
+    # Same question by stratification instead of regression: keep only pairs
+    # that are far apart in sequence, where local attention cannot help.
+    distant = df[df.seq_separation > 50]
+    if len(distant) > 20:
+        rho_d, p_d = spearmanr(distant.ca_distance, distant.abs_epistasis)
+        print(f"  among pairs >50 residues apart in sequence (n={len(distant)}):"
+              f" rho = {rho_d:+.3f}, p = {p_d:.2g}")
+        if p_d < 0.05 and rho_d < 0:
+            print("     -> the decay survives with sequence proximity removed:"
+                  " genuinely spatial")
+        else:
+            print("     -> the decay does NOT survive: what looked spatial was"
+                  " sequence proximity")
+    print()
+
     # --- the comparison that matters for us: the real pair against its own bin
     band = df[(df.ca_distance > REAL_CA_DISTANCE - 4) &
               (df.ca_distance < REAL_CA_DISTANCE + 4)]
