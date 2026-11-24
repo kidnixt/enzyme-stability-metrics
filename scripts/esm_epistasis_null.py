@@ -21,6 +21,7 @@ Usage
 """
 
 import argparse
+import itertools
 import math
 import random
 import sys
@@ -61,6 +62,13 @@ def main():
     ap.add_argument("--pdb", default="data/raw/WT (4).pdb")
     ap.add_argument("--out", default="data/processed/esm2_epistasis_null.csv")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--stratified", action="store_true",
+                    help="balance the sample across CA-distance bins instead of "
+                         "sampling uniformly; random pairs in a globular protein "
+                         "are nearly all far apart, so uniform sampling starves "
+                         "the short-distance bins")
+    ap.add_argument("--per-bin", type=int, default=40,
+                    help="pairs per distance bin when --stratified is set")
     args = ap.parse_args()
 
     rng = random.Random(args.seed)
@@ -71,17 +79,41 @@ def main():
     tok, model, device = plm.load_model(args.model, device=args.device)
     print(f"loaded {args.model} on {device}", flush=True)
 
-    rows = []
-    for i in range(args.n_pairs):
-        while True:
-            p, q = rng.sample(positions, 2)
-            try:
-                wt_p = wt[plm.string_index(p)]
-                wt_q = wt[plm.string_index(q)]
-            except IndexError:
+    def residues_ok(p, q):
+        try:
+            return wt[plm.string_index(p)] in AA and wt[plm.string_index(q)] in AA
+        except IndexError:
+            return False
+
+    if args.stratified:
+        BINS = [(0, 8), (8, 12), (12, 16), (16, 20), (20, 25), (25, 30), (30, 1e9)]
+        buckets = {b: [] for b in BINS}
+        for p, q in itertools.combinations(positions, 2):
+            if not residues_ok(p, q):
                 continue
-            if wt_p in AA and wt_q in AA:
-                break
+            d = math.dist(ca[p], ca[q])
+            for lo, hi in BINS:
+                if lo <= d < hi:
+                    buckets[(lo, hi)].append((p, q))
+                    break
+        pairs = []
+        for b, candidates in buckets.items():
+            take = min(args.per_bin, len(candidates))
+            pairs += rng.sample(candidates, take)
+            print(f"  bin {b[0]}-{b[1]} A: {len(candidates)} available, taking {take}")
+        rng.shuffle(pairs)
+        print(f"stratified sample: {len(pairs)} pairs total", flush=True)
+    else:
+        pairs = []
+        while len(pairs) < args.n_pairs:
+            p, q = rng.sample(positions, 2)
+            if residues_ok(p, q):
+                pairs.append((p, q))
+
+    rows = []
+    for i, (p, q) in enumerate(pairs):
+        wt_p = wt[plm.string_index(p)]
+        wt_q = wt[plm.string_index(q)]
         mut_p = rng.choice([a for a in AA if a != wt_p])
         mut_q = rng.choice([a for a in AA if a != wt_q])
 
@@ -95,7 +127,7 @@ def main():
             "epistasis": eps,
         })
         if (i + 1) % 25 == 0:
-            print(f"  {i+1}/{args.n_pairs}", flush=True)
+            print(f"  {i+1}/{len(pairs)}", flush=True)
 
     real = pair_epistasis(tok, model, device, wt, REAL_PAIR[0], REAL_PAIR[1])
     d_real = math.dist(ca[126], ca[314])
