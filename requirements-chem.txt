@@ -1,0 +1,11 @@
+# Molecule half: SMILES -> 3D -> descriptors. Installed into BOTH venvs,
+# because mlip needs rdkit to build geometries for UMA and analysis needs it
+# for the classical descriptors.
+rdkit
+# mordredcommunity, not mordred: the original is unmaintained since 2018 and
+# breaks on numpy>=1.24 (it calls np.float).
+mordredcommunity
+scikit-learn
+scipy
+matplotlib
+pandas
