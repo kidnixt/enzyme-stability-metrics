@@ -35,14 +35,22 @@ def do_single(path):
     mut_col, ddg_col = cols_of(df)
     print(f"--- singles: {len(df)} rows, format e.g. {df[mut_col].iloc[1]!r}\n")
 
+    # The string is two letters, a number and a letter: one of the two letters
+    # is the chain and the other the wild-type residue, and which is which is
+    # not decidable from a row like "AA4C" where both happen to be A. So parse
+    # the parts and accept either order.
+    parsed = df[mut_col].astype(str).str.extract(r"^(.)(.)(\d+)(.)$")
+    parsed.columns = ["c1", "c2", "pos", "mut"]
+    df = df.join(parsed)
+    df["pos"] = pd.to_numeric(df["pos"], errors="coerce")
+
     found = {}
     for name, (wt, pos, mut) in TARGETS.items():
-        # chain prefix may or may not be there, so anchor at the end
-        hit = df[df[mut_col].astype(str).str.endswith(f"{wt}{pos}{mut}")]
+        hit = df[(df["pos"] == pos) & (df["mut"] == mut) &
+                 ((df["c1"] == wt) | (df["c2"] == wt))]
         if len(hit) != 1:
-            print(f"{name}: {len(hit)} matches; rows at position {pos}:")
-            print(df[df[mut_col].astype(str).str.contains(f"{wt}{pos}",
-                                                          na=False)].to_string())
+            print(f"{name}: {len(hit)} matches; all rows at position {pos}:")
+            print(df[df["pos"] == pos].head(25).to_string())
             continue
         ddg = float(hit.iloc[0][ddg_col])
         pctile = (df[ddg_col] < ddg).mean() * 100
@@ -69,14 +77,15 @@ def do_pairs(path, additive):
     mut_col, ddg_col = cols_of(df)
     print(f"\n--- pairs: {len(df)} rows, format e.g. {df[mut_col].iloc[0]!r}")
 
-    a, b = seq_index(126), seq_index(314)
+    # The pairs file numbers positions as sequence index + 1, i.e. canonical - 3.
+    a, b = 126 - 3, 314 - 3
     s = df[mut_col].astype(str)
     both = df[s.str.contains(f"S{a}R", na=False) & s.str.contains(f"D{b}A", na=False)]
     print(f"rows with S{a}R and D{b}A together: {len(both)}")
 
     if len(both) == 0:
-        at_a = df[s.str.contains(f"{a}", na=False)]
-        print(f"\nrows mentioning index {a} at all: {len(at_a)}")
+        at_a = df[s.str.contains(f"S{a}", na=False)]
+        print(f"\nrows mentioning S{a} at all: {len(at_a)}")
         print(at_a.head(10).to_string())
         print("\nfirst rows of the file, to read the real format:")
         print(df.head(10).to_string())
