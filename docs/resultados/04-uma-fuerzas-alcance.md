@@ -1,8 +1,12 @@
 # X3 — UMA: la cuenta es aditiva por construcción, y el efecto no lo es
 
-Fecha: 2026-11-24. Modelo: `uma-s-1p1` (FAIRChem, tarea `omol`).
+Fecha: 2026-11-24. Modelo: `uma-s-1p2` (FAIRChem, tarea `omol`).
+El checkpoint 1p1 se descartó por el defecto documentado en
+`05-uma-checkpoints.md`; recalculado con 1p2 los números se mueven en el
+tercer decimal y ninguna conclusión cambia.
 Estructuras: los cuatro PDB de MOE. Medición digitalizada de figura.
 Script: `scripts/uma_forces.py`, análisis en `scripts/analyze_uma_forces.py`.
+Datos: `data/processed/uma_forces_r9_1p2.csv`.
 
 ## La pregunta
 
@@ -35,8 +39,8 @@ estructura y la posición vigilada se reporta como z-score contra ese nulo.
 
 | posición | z en WT (sin mutar) |
 |---|---|
-| 126 | +0.76 |
-| 314 | +0.68 |
+| 126 | +0.79 |
+| 314 | +0.69 |
 
 Las dos posiciones vigiladas están ~0.7σ por encima de una posición al azar
 **antes de mutar nada**. Entonces el z crudo no es el costo de la sustitución:
@@ -49,25 +53,25 @@ Fuerza máxima (eV/Å) en cada posición vigilada:
 
 | variante | pos 126 | pos 314 |
 |---|---|---|
-| WT | 4.594 | 4.480 |
-| D314A | 4.412 | **4.064** |
-| S126R | **6.516** | 4.480 |
-| DOUBLE | **6.514** | **4.064** |
+| WT | 4.6488 | 4.4937 |
+| D314A | 4.4512 | **4.0609** |
+| S126R | **6.5104** | 4.4937 |
+| DOUBLE | **6.5101** | **4.0611** |
 
 (negrita = la mutación está en esa posición)
 
-En la posición 314, S126R da **exactamente** el mismo valor que el WT, y DOUBLE
-da **exactamente** el mismo que D314A. En la 126, DOUBLE y S126R difieren en
-0.02%. El valor en una posición queda determinado únicamente por qué hay en esa
-posición.
+En la posición 314, S126R da **exactamente** el mismo valor que el WT (4.4937
+contra 4.4937), y DOUBLE prácticamente el mismo que D314A (4.0611 contra
+4.0609). En la 126, DOUBLE y S126R difieren en 0.005%. El valor en una
+posición queda determinado únicamente por qué hay en esa posición.
 
 Restando el WT:
 
 | variante | Δz 126 | Δz 314 | suma | meseta medida |
 |---|---|---|---|---|
-| D314A | −0.12 | **−0.28** | −0.40 | 47 |
-| S126R | **+1.32** | 0.00 | +1.32 | 22 |
-| DOUBLE | **+1.32** | **−0.28** | +1.04 | 48 |
+| D314A | −0.13 | **−0.30** | −0.43 | 47 |
+| S126R | **+1.28** | 0.00 | +1.28 | 22 |
+| DOUBLE | **+1.28** | **−0.30** | +0.98 | 48 |
 
 Tiene sentido físico: S126R mete tensión donde muta, y D314A *relaja* su
 posición, consistente con reemplazar una cadena lateral grande por una chica.
@@ -136,7 +140,7 @@ más.
 3. **Las coordenadas son de MOE**, con esqueleto rígido. Las fuerzas miden en
    parte la calidad de ese modelado, no solo la física de la sustitución.
 4. **Hay una señal de largo alcance que no es nuestra.** Cambiar 314 movió la
-   fuerza en 126 un 4% (4.594 → 4.412) aunque 314 no esté en la esfera. Eso
+   fuerza en 126 un 4% (4.6488 → 4.4512) aunque 314 no esté en la esfera. Eso
    viene de que MOE relajó la estructura distinto: está en las coordenadas de
    entrada, no es algo que UMA haya calculado. Es el modelo de MOE del efecto a
    distancia.
