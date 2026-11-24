@@ -52,7 +52,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--sdf", default="data/processed/molecules.sdf")
     ap.add_argument("--out", default="data/processed/mol_quantum.csv")
-    ap.add_argument("--model", default="uma-s-1p1")
+# uma-s-1p2 y no 1p1: medimos que 1p1 calcula mal las energias de
+# cationes en quimica organica comun (MAE 3.16 eV contra B3LYP, sesgo
+# -2.90), y que 1p2 lo corrige (MAE 0.29 eV, rho 0.902) sin alterar las
+# moleculas que 1p1 ya acertaba. Ver docs/resultados/05-uma-checkpoints.md
+    ap.add_argument("--model", default="uma-s-1p2")
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--limit", type=int, default=0, help="0 = todas")
     args = ap.parse_args()
