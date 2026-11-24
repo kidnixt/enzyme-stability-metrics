@@ -1,0 +1,20 @@
+# ThermoMPNN-D, solo lo necesario para INFERENCIA.
+# El environment.yaml del repo pide pytorch-cuda=11.7 junto con cudatoolkit=11.3,
+# combinacion que el solver de conda no resuelve en tiempo razonable.
+#
+# Esta lista sale de seguir la cadena real de imports:
+#   v2_ssm -> thermompnn.ssm_utils -> thermompnn.train_thermompnn -> pytorch_lightning, wandb
+#                                  -> thermompnn.trainer.v2_trainer -> pytorch_lightning
+# mmseqs2, notebook e ipykernel son para entrenamiento o demos: no van.
+#
+# torch se instala aparte, con el indice de CUDA (ver setup_thermompnn.sh).
+pytorch-lightning
+torchmetrics
+wandb
+omegaconf
+biopython
+numpy
+pandas
+scipy
+scikit-learn
+tqdm
